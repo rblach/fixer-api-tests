@@ -53,14 +53,20 @@ Feature: Fixer API Timeseries Endpoint
       | 2025-01-01 | 2025-01-02 |
       | 1901-12-13 | 1901-12-25 |
 
-  Scenario: Invalid API key
+  Scenario: Request with missing required parameters
+    Given I have a valid API key
+    When I send a GET request to the timeseries endpoint with the following parameters:
+      | start_date | <start_date> |
+    Then the response status code should be 400
+
+  Scenario: Request with invalid API key
     Given I have an invalid API key
     When I send a GET request to the timeseries endpoint with the following parameters:
       | start_date | 2023-01-01 |
       | end_date   | 2023-01-31 |
     Then the response status code should be 401
 
-  Scenario: Missing API key
+  Scenario: Request with missing API key
     Given I do not provide an API key
     When I send a GET request to the timeseries endpoint without API key
     Then the response status code should be 401
@@ -71,7 +77,6 @@ Feature: Fixer API Timeseries Endpoint
     When I send a GET request to a non-existent endpoint
     Then the response status code should be 200
     And the response contains error with code 302 and type "invalid_date"
-
 
   Scenario: Exceeding rate limit
     Given I have exceeded the API rate limit
